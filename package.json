@@ -18,6 +18,7 @@
   "clawdbot": {
     "extensions": ["./plugin.ts"],
     "channels": ["dingtalk"],
+    "installDependencies": true,
     "channel": {
       "id": "dingtalk",
       "label": "DingTalk",
