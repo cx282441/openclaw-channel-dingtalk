@@ -1,343 +1,334 @@
 # DingTalk Channel for OpenClaw
 
-钉钉企业内部机器人 Channel 插件，使用 Stream 模式（无需公网 IP）。
+An internal enterprise bot **channel plugin** for DingTalk using **Stream mode** (no public IP required).
 
-## 功能特性
+## Features
 
-- ✅ **Stream 模式** — WebSocket 长连接，无需公网 IP 或 Webhook
-- ✅ **私聊支持** — 直接与机器人对话
-- ✅ **群聊支持** — 在群里 @机器人
-- ✅ **多种消息类型** — 文本、图片、语音（自带识别）、视频、文件
-- ✅ **Markdown 回复** — 支持富文本格式回复
-- ✅ **互动卡片** — 支持流式更新，适用于 AI 实时输出
-- ✅ **完整 AI 对话** — 接入 Clawdbot 消息处理管道
+- ✅ **Stream Mode** — WebSocket long-lived connection; no public IP or webhook required
+- ✅ **Direct Messages** — chat with the bot 1:1
+- ✅ **Group Chats** — @mention the bot in a group
+- ✅ **Multiple Message Types** — text, images, audio (with built-in recognition), video, files
+- ✅ **Markdown Replies** — rich-text formatted responses
+- ✅ **Interactive Cards** — streaming updates, ideal for real-time AI output
+- ✅ **End-to-End AI Chat** — integrated with the Clawdbot message processing pipeline
 
-## 安装
+## Installation
 
-### 方法 A：通过远程仓库安装 (推荐)
+### Method A: Install from remote repository (recommended)
 
-直接运行 openclaw 插件安装命令，openclaw 会自动处理下载、安装依赖和注册：
+Run the OpenClaw plugin install command. OpenClaw will handle download, dependency installation, and registration automatically:
 
 ```bash
 openclaw plugins install https://github.com/soimy/clawdbot-channel-dingtalk.git
 ```
 
-### 方法 B：通过本地源码安装
+### Method B: Install from local source
 
-如果你想对插件进行二次开发，可以先克隆仓库：
+If you want to customize the plugin, clone the repository first:
 
 ```bash
-# 1. 克隆仓库
+# 1. Clone the repo
 git clone https://github.com/soimy/openclaw-channel-dingtalk.git
 cd openclaw-channel-dingtalk
 
-# 2. 安装依赖 (必需)
+# 2. Install dependencies (required)
 npm install
 
-# 3. 以链接模式安装 (方便修改代码后实时生效)
+# 3. Install in link mode (changes take effect immediately)
 openclaw plugins install -l .
 ```
 
-### 方法 C：手动安装
+### Method C: Manual installation
 
-1. 将本目录下载或复制到 `~/.openclaw/extensions/dingtalk`。
-2. 确保包含 `index.ts`, `openclaw.plugin.json` 和 `package.json`。
-3. 运行 `openclaw plugins list` 确认 `dingtalk` 已显示在列表中。
+1. Download/copy this directory to `~/.openclaw/extensions/dingtalk`.
+2. Ensure it contains `index.ts`, `openclaw.plugin.json`, and `package.json`.
+3. Run `openclaw plugins list` and confirm `dingtalk` is listed.
 
-## 更新
+## Update
 
-```
+```bash
 openclaw plugins update dingtalk
 ```
 
-## 配置
+## Configuration
 
-### 1. 创建钉钉应用
+### 1. Create a DingTalk app
 
-1. 访问 [钉钉开发者后台](https://open-dev.dingtalk.com/)
-2. 创建企业内部应用
-3. 添加「机器人」能力
-4. 配置消息接收模式为 **Stream 模式**
-5. 发布应用
+1. Visit the [DingTalk Developer Console](https://open-dev.dingtalk.com/)
+2. Create an internal enterprise application
+3. Add the "Bot" capability
+4. Set message receiving mode to **Stream mode**
+5. Publish the app
 
-### 2. 配置权限管理
+### 2. Configure permissions
 
-在应用的权限管理页面，需要开启以下权限：
+On the app's permission page, enable the following:
 
-- ✅ **Card.Instance.Write** — 创建和投放卡片实例
-- ✅ **Card.Streaming.Write** — 对卡片进行流式更新
+- ✅ **Card.Instance.Write** — create and deliver card instances
+- ✅ **Card.Streaming.Write** — stream updates to cards
 
-**步骤：**
+Steps:
 
-1. 进入应用 → 权限管理
-2. 搜索「Card」相关权限
-3. 勾选上述两个权限
-4. 保存权限配置
+1. Open the app -> Permissions
+2. Search for permissions related to "Card"
+3. Enable the two permissions above
+4. Save
 
-### 3. 建立卡片模板
+### 3. Create a card template
 
-**步骤：**
+Steps:
 
-1. 访问 [钉钉卡片平台](https://open-dev.dingtalk.com/fe/card)
-2. 进入「我的模板」
-3. 点击「创建模板」
-4. 卡片模板场景选择 **「AI 卡片」**
-5. 按需设计卡片排版,点击保存并发布
-6. 记下模板中定义的内容字段名称
-7. 复制模板 ID（格式如：`xxxxx-xxxxx-xxxxx.schema`）
-8. 将 templateId 配置到 `openclaw.json` 的 `cardTemplateId` 字段
-9. 或在OpenClaw控制台的Channel标签->Dingtalk配置面板-> Card Template Id填入
-10. 将记下的内容字段变量名配置到 `openclaw.json` 的 `cardTemplateKey` 字段
-11. 或在OpenClaw控制台的Channel标签->Dingtalk配置面板-> Card Template Key填入
+1. Visit the [DingTalk Card Platform](https://open-dev.dingtalk.com/fe/card)
+2. Go to "My Templates"
+3. Click "Create Template"
+4. Choose **"AI Card"** as the scenario
+5. Design the layout, then save and publish
+6. Note the content field name defined in the template
+7. Copy the template ID (format: `xxxxx-xxxxx-xxxxx.schema`)
+8. Set `cardTemplateId` in `openclaw.json`
+9. Or set it in OpenClaw Console -> Channels -> DingTalk -> Card Template Id
+10. Set `cardTemplateKey` in `openclaw.json`
+11. Or set it in OpenClaw Console -> Channels -> DingTalk -> Card Template Key
 
-**说明：**
+Notes:
 
-- 使用 DingTalk 官方 AI 卡片模板时，`cardTemplateKey` 默认为 `'msgContent'`，无需修改
-- 如果您创建自定义卡片模板，需要确保模板中包含相应的内容字段，并将 `cardTemplateKey` 配置为该字段名称
+- With DingTalk's official AI Card template, `cardTemplateKey` defaults to `msgContent`.
+- If you create a custom template, make sure the template includes the content field you intend to update, and set `cardTemplateKey` to that field name.
 
-**模板配置示例：**
+Template config example:
 
-```json
+```json5
 {
-  "channels": {
-    "dingtalk": {
-      ... 
-      "messageType": 'card',
-      "cardTemplateId": '你复制的模板ID',
-      "cardTemplateKey": '你模板的内容变量',
-      ...
+  channels: {
+    dingtalk: {
+      messageType: 'card',
+      cardTemplateId: '<your-template-id>',
+      cardTemplateKey: '<your-template-content-key>',
     },
   },
 }
 ```
 
-### 4. 获取凭证
+### 4. Get credentials
 
-从开发者后台获取：
+From the developer console:
 
 - **Client ID** (AppKey)
 - **Client Secret** (AppSecret)
-- **Robot Code** (与 Client ID 相同)
-- **Corp ID** (企业 ID)
-- **Agent ID** (应用 ID)
+- **Robot Code** (same as Client ID)
+- **Corp ID** (enterprise ID)
+- **Agent ID** (application ID)
 
-### 5. 配置 OpenClaw
+### 5. Configure OpenClaw
 
-在 `~/.openclaw/openclaw.json` 的 `channels` 下添加：
-
-> 只添加dingtalk部分，内容自己替换
+Add the following under `channels` in `~/.openclaw/openclaw.json`:
 
 ```json5
 {
-  ...
-  "channels": {
-    "telegram": { ... },
-
-    "dingtalk": {
-      "enabled": true,
-      "clientId": "dingxxxxxx",
-      "clientSecret": "your-app-secret",
-      "robotCode": "dingxxxxxx",
-      "corpId": "dingxxxxxx",
-      "agentId": "123456789",
-      "dmPolicy": "open",
-      "groupPolicy": "open",
-      "messageType": "markdown",
-      "debug": false
-    }
+  channels: {
+    dingtalk: {
+      enabled: true,
+      clientId: 'dingxxxxxx',
+      clientSecret: 'your-app-secret',
+      robotCode: 'dingxxxxxx',
+      corpId: 'dingxxxxxx',
+      agentId: '123456789',
+      dmPolicy: 'open',
+      groupPolicy: 'open',
+      messageType: 'markdown',
+      debug: false,
+    },
   },
-  ...
 }
 ```
 
-### 6. 重启 Gateway
+### 6. Restart Gateway
 
 ```bash
 openclaw gateway restart
 ```
 
-## 配置选项
+## Configuration Options
 
-| 选项                    | 类型     | 默认值                                          | 说明                                        |
-| ----------------------- | -------- | ----------------------------------------------- | ------------------------------------------- |
-| `enabled`               | boolean  | `true`                                          | 是否启用                                    |
-| `clientId`              | string   | 必填                                            | 应用的 AppKey                               |
-| `clientSecret`          | string   | 必填                                            | 应用的 AppSecret                            |
-| `robotCode`             | string   | -                                               | 机器人代码（用于下载媒体和发送卡片）        |
-| `corpId`                | string   | -                                               | 企业 ID                                     |
-| `agentId`               | string   | -                                               | 应用 ID                                     |
-| `dmPolicy`              | string   | `"open"`                                        | 私聊策略：open/pairing/allowlist            |
-| `groupPolicy`           | string   | `"open"`                                        | 群聊策略：open/allowlist                    |
-| `allowFrom`             | string[] | `[]`                                            | 允许的发送者 ID 列表                        |
-| `messageType`           | string   | `"markdown"`                                    | 消息类型：markdown/card                     |
-| `cardTemplateId`        | string   |                                                 | AI 互动卡片模板 ID（仅当 messageType=card） |
-| `cardTemplateKey`       | string   | `"content"`                                     | 卡片模板内容字段键（仅当 messageType=card） |
-| `debug`                 | boolean  | `false`                                         | 是否开启调试日志                            |
-| `maxConnectionAttempts` | number   | `10`                                            | 最大连接尝试次数                            |
-| `initialReconnectDelay` | number   | `1000`                                          | 初始重连延迟（毫秒）                        |
-| `maxReconnectDelay`     | number   | `60000`                                         | 最大重连延迟（毫秒）                        |
-| `reconnectJitter`       | number   | `0.3`                                           | 重连延迟抖动因子（0-1）                     |
+| Option                  | Type     | Default      | Description                                       |
+| ----------------------- | -------- | ------------ | ------------------------------------------------- |
+| `enabled`               | boolean  | `true`       | Enable/disable                                    |
+| `clientId`              | string   | required     | App AppKey                                        |
+| `clientSecret`          | string   | required     | App AppSecret                                     |
+| `robotCode`             | string   | -            | Robot code (media download and cards)             |
+| `corpId`                | string   | -            | Corp ID                                           |
+| `agentId`               | string   | -            | Agent/App ID                                      |
+| `dmPolicy`              | string   | `"open"`     | DM policy: open/pairing/allowlist                 |
+| `groupPolicy`           | string   | `"open"`     | Group policy: open/allowlist                      |
+| `allowFrom`             | string[] | `[]`         | Allowed sender ID list                            |
+| `messageType`           | string   | `"markdown"` | Message type: markdown/card                       |
+| `cardTemplateId`        | string   | -            | AI card template ID (messageType=card only)       |
+| `cardTemplateKey`       | string   | `"content"`  | Card template content key (messageType=card only) |
+| `debug`                 | boolean  | `false`      | Enable debug logs                                 |
+| `maxConnectionAttempts` | number   | `10`         | Max connection attempts                           |
+| `initialReconnectDelay` | number   | `1000`       | Initial reconnect delay (ms)                      |
+| `maxReconnectDelay`     | number   | `60000`      | Max reconnect delay (ms)                          |
+| `reconnectJitter`       | number   | `0.3`        | Reconnect jitter factor (0-1)                     |
 
-### 连接鲁棒性配置
+### Connection robustness
 
-为提高连接稳定性，插件支持以下高级配置：
+Advanced settings to improve stability:
 
-- **maxConnectionAttempts**: 连接失败后的最大重试次数，超过后将停止尝试并报警。
-- **initialReconnectDelay**: 第一次重连的初始延迟（毫秒），后续重连会按指数增长。
-- **maxReconnectDelay**: 重连延迟的上限（毫秒），防止等待时间过长。
-- **reconnectJitter**: 延迟抖动因子，在延迟基础上增加随机变化（±30%），避免多个客户端同时重连。
+- **maxConnectionAttempts**: maximum retries after failures; stops and alerts after exceeding.
+- **initialReconnectDelay**: initial delay for the first reconnect (ms); subsequent reconnects grow exponentially.
+- **maxReconnectDelay**: reconnect delay cap (ms) to prevent very long waits.
+- **reconnectJitter**: adds randomness to the delay (+/- 30% by default) to avoid thundering herds.
 
-重连延迟计算公式：`delay = min(initialDelay × 2^attempt, maxDelay) × (1 ± jitter)`
+Reconnect delay formula: `delay = min(initialDelay * 2^attempt, maxDelay) * (1 +/- jitter)`
 
-示例延迟序列（默认配置）：~1s, ~2s, ~4s, ~8s, ~16s, ~32s, ~60s（达到上限）
+Example delays (defaults): ~1s, ~2s, ~4s, ~8s, ~16s, ~32s, ~60s (capped)
 
-更多详情请参阅 [CONNECTION_ROBUSTNESS.md](./CONNECTION_ROBUSTNESS.md)。
+See [CONNECTION_ROBUSTNESS.md](./CONNECTION_ROBUSTNESS.md) for details.
 
-## 安全策略
+## Security Policies
 
-### 私聊策略 (dmPolicy)
+### Direct message policy (dmPolicy)
 
-- `open` — 任何人都可以私聊机器人
-- `pairing` — 新用户需要通过配对码验证
-- `allowlist` — 只有 allowFrom 列表中的用户可以使用
+- `open` - anyone can DM the bot
+- `pairing` - new users must verify via a pairing code
+- `allowlist` - only users in `allowFrom` can use it
 
-### 群聊策略 (groupPolicy)
+### Group policy (groupPolicy)
 
-- `open` — 任何群都可以 @机器人
-- `allowlist` — 只有配置的群可以使用
+- `open` - any group can @mention the bot
+- `allowlist` - only configured groups can use it
 
-## 消息类型支持
+## Supported Message Types
 
-### 接收
+### Receiving
 
-| 类型   | 支持 | 说明                 |
-| ------ | ---- | -------------------- |
-| 文本   | ✅   | 完整支持             |
-| 富文本 | ✅   | 提取文本内容         |
-| 图片   | ✅   | 下载并传递给 AI      |
-| 语音   | ✅   | 使用钉钉语音识别结果 |
-| 视频   | ✅   | 下载并传递给 AI      |
-| 文件   | ✅   | 下载并传递给 AI      |
+| Type      | Supported | Notes                            |
+| --------- | --------- | -------------------------------- |
+| Text      | ✅        | Full support                     |
+| Rich text | ✅        | Extracts text content            |
+| Image     | ✅        | Downloads and passes to AI       |
+| Audio     | ✅        | Uses DingTalk speech recognition |
+| Video     | ✅        | Downloads and passes to AI       |
+| File      | ✅        | Downloads and passes to AI       |
 
-### 发送
+### Sending
 
-| 类型     | 支持 | 说明                             |
-| -------- | ---- | -------------------------------- |
-| 文本     | ✅   | 完整支持                         |
-| Markdown | ✅   | 自动检测或手动指定               |
-| 互动卡片 | ✅   | 支持流式更新，适用于 AI 实时输出 |
-| 图片     | ⏳   | 需要通过媒体上传 API             |
+| Type             | Supported | Notes                                     |
+| ---------------- | --------- | ----------------------------------------- |
+| Text             | ✅        | Full support                              |
+| Markdown         | ✅        | Auto-detect or manual                     |
+| Interactive card | ✅        | Streaming updates for real-time AI output |
+| Image            | ⏳        | Requires the media upload API             |
 
-## API 消耗说明
+## API Cost Notes
 
-### Text/Markdown 模式
+### Text/Markdown mode
 
-| 操作       | API 调用次数 | 说明                                                                         |
-| ---------- | ------------ | ---------------------------------------------------------------------------- |
-| 获取 Token | 1            | 共享/缓存（60 秒检查过期一次）                                               |
-| 发送消息   | 1            | 使用 `/v1.0/robot/oToMessages/batchSend` 或 `/v1.0/robot/groupMessages/send` |
-| **总计**   | **2**        | 每条回复 1 次                                                                |
+| Operation    | API calls | Notes                                                                        |
+| ------------ | --------- | ---------------------------------------------------------------------------- |
+| Get token    | 1         | Shared/cached (checks expiry once every 60 seconds)                          |
+| Send message | 1         | Uses `/v1.0/robot/oToMessages/batchSend` or `/v1.0/robot/groupMessages/send` |
+| **Total**    | **2**     | Per reply                                                                    |
 
-### Card（AI 互动卡片）模式
+### Card (AI interactive card) mode
 
-| 阶段         | API 调用               | 说明                                                |
-| ------------ | ---------------------- | --------------------------------------------------- |
-| **创建卡片** | 1                      | `POST /v1.0/card/instances/createAndDeliver`        |
-| **流式更新** | M                      | M = 回复块数量，每块一次 `PUT /v1.0/card/streaming` |
-| **完成卡片** | 包含在最后一次流更新中 | 使用 `isFinalize=true` 标记                         |
-| **总计**     | **1 + M**              | M = Agent 产生的回复块数                            |
+| Stage              | API calls               | Notes                                            |
+| ------------------ | ----------------------- | ------------------------------------------------ |
+| **Create card**    | 1                       | `POST /v1.0/card/instances/createAndDeliver`     |
+| **Stream updates** | M                       | M = number of chunks; `PUT /v1.0/card/streaming` |
+| **Finish card**    | Included in last update | Mark with `isFinalize=true`                      |
+| **Total**          | **1 + M**               | M = number of chunks produced by the agent       |
 
-### 典型场景成本对比
+### Typical scenario comparison
 
-| 场景             | Text/Markdown | Card | 节省   |
-| ---------------- | ------------- | ---- | ------ |
-| 简短回复（1 块） | 2             | 2    | ✓ 相同 |
-| 中等回复（5 块） | 6             | 6    | ✓ 相同 |
-| 长回复（10 块）  | 12            | 11   | ✓ 1 次 |
+| Scenario                | Text/Markdown | Card | Savings |
+| ----------------------- | ------------- | ---- | ------- |
+| Short reply (1 chunk)   | 2             | 2    | Same    |
+| Medium reply (5 chunks) | 6             | 6    | Same    |
+| Long reply (10 chunks)  | 12            | 11   | 1 call  |
 
-### 优化策略
+### Optimization strategies
 
-**降低 API 调用的方法：**
+Ways to reduce API calls:
 
-1. **合并回复块** — 通过调整 Agent 输出配置，减少块数量
-2. **使用缓存** — Token 自动缓存（60 秒），无需每次都获取
-3. **Buffer 模式** — 使用 `dispatchReplyWithBufferedBlockDispatcher` 合并多个小块
+1. Merge chunks - adjust agent output to reduce chunk count
+2. Token caching - tokens are cached automatically (60 seconds)
+3. Buffer mode - use `dispatchReplyWithBufferedBlockDispatcher` to merge small chunks
 
-**成本建议：**
+Recommendation:
 
-- ✅ **推荐** — Card 模式：流式体验更好，成本与 Text/Markdown 相当或更低
-- ⚠️ **谨慎** — 频繁调用需要监测配额，建议使用钉钉开发者后台查看 API 调用量
+- Card mode is recommended: better streaming UX, similar or lower cost than Text/Markdown.
+- Monitor quotas if you call APIs frequently; check usage in DingTalk developer console.
 
-## 消息类型选择
+## Choosing Message Type
 
-插件支持两种消息回复类型，可通过 `messageType` 配置：
+The plugin supports two reply types via `messageType`:
 
-### 1. markdown（Markdown 格式）**【默认】**
+### 1. `markdown` (default)
 
-- 支持富文本格式（标题、粗体、列表等）
-- 自动检测消息是否包含 Markdown 语法
-- 适用于大多数场景
+- Rich formatting (headings, bold, lists)
+- Auto-detects Markdown
+- Suitable for most scenarios
 
-### 2. card（AI 互动卡片）
+### 2. `card` (AI interactive card)
 
-- 支持流式更新（实时显示 AI 生成内容）
-- 更好的视觉呈现和交互体验
-- 支持 Markdown 格式渲染
-- 通过 `cardTemplateId` 指定模板
-- 通过 `cardTemplateKey` 指定内容字段
-- **适用于 AI 对话场景**
+- True streaming updates (real-time AI output)
+- Better visual presentation and interaction
+- Renders Markdown
+- Template via `cardTemplateId`
+- Content field via `cardTemplateKey`
+- Best for AI chat scenarios
 
-**AI Card API 特性：**
-当配置 `messageType: 'card'` 时：
+When `messageType: "card"` is configured:
 
-1. 使用 `/v1.0/card/instances/createAndDeliver` 创建并投放卡片
-2. 使用 `/v1.0/card/streaming` 实现真正的流式更新
-3. 自动状态管理（PROCESSING → INPUTING → FINISHED）
-4. 更稳定的流式体验，无需手动节流
+1. Create + deliver via `/v1.0/card/instances/createAndDeliver`
+2. Stream via `/v1.0/card/streaming`
+3. Automatic state management (PROCESSING -> INPUTING -> FINISHED)
+4. Stable streaming experience without manual throttling
 
-**配置示例：**
+Config example:
 
 ```json5
 {
-  messageType: 'card', // 启用 AI 互动卡片模式
-  cardTemplateId: '382e4302-551d-4880-bf29-a30acfab2e71.schema', // AI 卡片模板 ID（默认值）
-  cardTemplateKey: 'msgContent', // 卡片内容字段键（默认值：msgContent）
+  messageType: 'card',
+  cardTemplateId: '382e4302-551d-4880-bf29-a30acfab2e71.schema',
+  cardTemplateKey: 'msgContent',
 }
 ```
 
-> **注意**：`cardTemplateKey` 应与您的卡片模板中定义的字段名称一致。默认值为 `'msgContent'`，适用于 DingTalk 官方 AI 卡片模板。如果您使用自定义模板，请根据模板定义的字段名称进行配置。
+Note: `cardTemplateKey` must match your template field name. `msgContent` works with DingTalk's official AI Card template.
 
-## 使用示例
+## Usage
 
-配置完成后，直接在钉钉中：
+After configuration:
 
-1. **私聊机器人** — 找到机器人，发送消息
-2. **群聊 @机器人** — 在群里 @机器人名称 + 消息
+1. DM the bot - find the bot and send a message
+2. In a group chat - @mention the bot name and send your message
 
-## 故障排除
+## Troubleshooting
 
-### 收不到消息
+### Not receiving messages
 
-1. 确认应用已发布
-2. 确认消息接收模式是 Stream
-3. 检查 Gateway 日志：`openclaw logs | grep dingtalk`
+1. Confirm the app is published
+2. Confirm message receiving mode is Stream
+3. Check Gateway logs: `openclaw logs | grep dingtalk`
 
-### 群消息无响应
+### No response in group chats
 
-1. 确认机器人已添加到群
-2. 确认正确 @机器人（使用机器人名称）
-3. 确认群是企业内部群
+1. Confirm the bot has been added to the group
+2. Confirm you @mentioned the bot correctly (use the bot name)
+3. Confirm the group is an internal enterprise group
 
-### 连接失败
+### Connection failed
 
-1. 检查 clientId 和 clientSecret 是否正确
-2. 确认网络可以访问钉钉 API
+1. Check `clientId` and `clientSecret`
+2. Confirm the network can access the DingTalk API
 
-## 开发指南
+## Development
 
-### 首次设置
+### First-time setup
 
-1. 克隆仓库并安装依赖
+1. Clone the repo and install dependencies
 
 ```bash
 git clone https://github.com/soimy/openclaw-channel-dingtalk.git
@@ -345,116 +336,97 @@ cd openclaw-channel-dingtalk
 npm install
 ```
 
-2. 验证开发环境
+2. Verify your dev environment
 
 ```bash
-npm run type-check              # TypeScript 类型检查
-npm run lint                    # ESLint 代码检查
+npm run type-check
+npm run lint
 ```
 
-### 常用命令
+### Common commands
 
-| 命令                 | 说明                |
-| -------------------- | ------------------- |
-| `npm run type-check` | TypeScript 类型检查 |
-| `npm run lint`       | ESLint 代码检查     |
-| `npm run lint:fix`   | 自动修复格式问题    |
+| Command              | Description           |
+| -------------------- | --------------------- |
+| `npm run type-check` | TypeScript type check |
+| `npm run lint`       | ESLint checks         |
+| `npm run lint:fix`   | Auto-fix formatting   |
 
-### 项目结构
+### Project structure
 
 ```
 src/
-  channel.ts           - 插件定义和辅助函数（535 行）
-  runtime.ts           - 运行时管理（14 行）
-  types.ts             - 类型定义（30+ interfaces）
+  channel.ts           - plugin definition and helpers
+  runtime.ts           - runtime management
+  types.ts             - type definitions
 
-index.ts              - 插件注册（29 行）
-utils.ts              - 工具函数（110 行）
+index.ts              - plugin registration
+utils.ts              - utility functions
 
-openclaw.plugin.json  - 插件配置
-package.json          - 项目配置
-README.md             - 本文件
+openclaw.plugin.json  - plugin manifest
+package.json          - project configuration
+README.md             - this file
 ```
 
-### 代码质量
+### Types
 
-- **TypeScript**: 严格模式，0 错误
-- **ESLint**: 自动检查和修复
-- **Type Safety**: 完整的类型注解（30+ 接口）
+Core types live in `src/types.ts`, including:
 
-### 类型系统
+```ts
+// Config
+DingTalkConfig;
+DingTalkChannelConfig;
 
-核心类型定义在 `src/types.ts` 中，包括：
+// Message processing
+DingTalkInboundMessage;
+MessageContent;
+HandleDingTalkMessageParams;
 
-```typescript
-// 配置
-DingTalkConfig; // 插件配置
-DingTalkChannelConfig; // 多账户配置
+// AI interactive cards
+AICardInstance;
+AICardCreateAndDeliverRequest;
+AICardStreamingRequest;
+AICardStatus;
 
-// 消息处理
-DingTalkInboundMessage; // 收到的钉钉消息
-MessageContent; // 解析后的消息内容
-HandleDingTalkMessageParams; // 消息处理参数
-
-// AI 互动卡片
-AICardInstance; // AI 卡片实例
-AICardCreateAndDeliverRequest; // 创建并投放卡片请求
-AICardStreamingRequest; // 流式更新请求
-AICardStatus; // 卡片状态常量
-
-// 工具函数类型
-Logger; // 日志接口
-RetryOptions; // 重试选项
-MediaFile; // 下载的媒体文件
+// Utilities
+Logger;
+RetryOptions;
+MediaFile;
 ```
 
-### 公开 API
+### Public API
 
-插件导出以下低级 API 函数，可用于自定义集成：
+The plugin exports low-level APIs for custom integrations:
 
-```typescript
-// 文本/Markdown 消息
-sendBySession(config, sessionWebhook, text, options); // 通过会话发送
+```ts
+// Text/Markdown
+sendBySession(config, sessionWebhook, text, options);
 
-// AI 互动卡片
-createAICard(config, conversationId, data, log); // 创建并投放 AI 卡片
-streamAICard(card, content, finished, log); // 流式更新卡片内容
-finishAICard(card, content, log); // 完成并关闭卡片
+// AI interactive cards
+createAICard(config, conversationId, data, log);
+streamAICard(card, content, finished, log);
+finishAICard(card, content, log);
 
-// 自动模式选择
-sendMessage(config, conversationId, text, options); // 根据配置自动选择（含卡片/文本回退）
+// Auto selection
+sendMessage(config, conversationId, text, options);
 
-// 认证
-getAccessToken(config, log); // 获取访问令牌
+// Auth
+getAccessToken(config, log);
 ```
 
-**使用示例：**
+Example:
 
-```typescript
+```ts
 import { createAICard, streamAICard, finishAICard } from './src/channel';
 
-// 创建 AI 卡片
 const card = await createAICard(config, conversationId, messageData, log);
 
-// 流式更新内容
 for (const chunk of aiResponseChunks) {
   await streamAICard(card, currentText + chunk, false, log);
 }
 
-// 完成并关闭卡片
 await finishAICard(card, finalText, log);
 ```
 
-### 架构
-
-插件遵循 Telegram 参考实现的架构模式：
-
-- **index.ts**: 最小化插件注册入口
-- **src/channel.ts**: 所有 DingTalk 特定的逻辑（API、消息处理、配置等）
-- **src/runtime.ts**: 运行时管理（getter/setter）
-- **src/types.ts**: 类型定义
-- **utils.ts**: 通用工具函数
-
-## 许可
+## License
 
 MIT
