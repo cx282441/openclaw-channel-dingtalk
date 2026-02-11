@@ -1228,7 +1228,7 @@ async function handleDingTalkMessage(params: HandleDingTalkMessageParams): Promi
   // Feedback: Thinking...
   if (dingtalkConfig.showThinking !== false) {
     try {
-      const thinkingText = '🤔 思考中，请稍候...';
+      const thinkingText = '🤔 Thinking… please wait.';
       // AI card already has thinking state visually, so we only send thinking message for non-card modes
       if (useCardMode && currentAICard) {
         log?.debug?.('[DingTalk] AI Card in thinking state, skipping thinking message send.');
